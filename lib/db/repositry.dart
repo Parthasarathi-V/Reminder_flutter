@@ -24,11 +24,11 @@ class Repository
   }
   readData(table) async{
     var connection = await database;
-    return await connection?.quary(table);
+    return await connection?.query(table);
   }
   readDataById(table, itemId) async{
     var connection = await database;
-    return await connection?.quary(table, where: 'id=?',whereArgs: [itemId]);
+    return await connection?.query(table, where: 'id=?',whereArgs: [itemId]);
   }
   updateData(table, data) async{
     var connection = await database;
@@ -38,6 +38,4 @@ class Repository
     var connection = await database;
     return await connection?.rawDelete("delete from $table where id = $itemId");
   }
-
-
 }
