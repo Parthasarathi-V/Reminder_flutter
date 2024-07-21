@@ -8,14 +8,13 @@ class DatabaseConnection{
     var directory = await getApplicationDocumentsDirectory();
     var path = join(directory.path, 'db');
     var database = await openDatabase(path,version: 1,onCreate: _createDatabase);
-    print(path);
     return database;
   }
 
   Future _createDatabase(Database database, int version) async{
-    String sql = "CREATE TABLE users (id INTEGER PRIMARY KEY, title TEXT, subtitle TEXT, date REAL);";
+    String sql = "CREATE TABLE task (id INTEGER PRIMARY KEY, title TEXT, subtitle TEXT, date REAL, importance TEXT);";
     await database.execute(sql);
-    print(database.execute(sql));
+    //print(database.execute(sql));
 
   }
 }

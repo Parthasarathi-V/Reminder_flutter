@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:reminder/home_page.dart';
-import 'package:reminder/model/user.dart';
+import 'package:reminder/model/task.dart';
 import 'package:reminder/search_page.dart';
-import 'package:reminder/serivice/user_service.dart';
+import 'package:reminder/serivice/task_service.dart';
 
 class AddTask extends StatefulWidget {
   @override
@@ -19,7 +19,7 @@ class _AddTaskState extends State<AddTask> {
   bool _validataTask = false;
   bool _validataSubtitle = false;
   bool _validataDate = false;
-  final _UserServices = UserService();
+  final _taskServices = TaskService();
   bool mst = false;
   bool imp = false;
   bool nim = false;
@@ -153,7 +153,7 @@ class _AddTaskState extends State<AddTask> {
                                 setState(() {
                                   mst = val!;
                                   if(mst == true){
-                                    _importanceInput = "Must Work";
+                                    _importanceInput = "Must";
                                     nim = false;
                                     imp = false;
                                   }
@@ -169,14 +169,14 @@ class _AddTaskState extends State<AddTask> {
                                 setState(() {
                                   imp = val!;
                                   if(imp == true){
-                                    _importanceInput = "Important Work";
+                                    _importanceInput = "Important";
                                     mst = false;
                                     nim = false;
                                   }
                                 });
                               }),
-                              SizedBox(width: 5,),
-                              Text("Important Work",style: TextStyle(fontSize: 13),)
+                              const SizedBox(width: 5,),
+                              const Text("Important Work",style: TextStyle(fontSize: 13),)
                             ],
                           ),
                           Row(
@@ -185,14 +185,14 @@ class _AddTaskState extends State<AddTask> {
                                 setState(() {
                                   nim = val!;
                                   if(nim == true){
-                                    _importanceInput = "Normal Work";
+                                    _importanceInput = "Work";
                                     mst = false;
                                     imp = false;
                                   }
                                 });
                               }),
-                              SizedBox(width: 5,),
-                              Text("Normal Work",style: TextStyle(fontSize: 13),)
+                              const SizedBox(width: 5,),
+                              const Text("Normal Work",style: TextStyle(fontSize: 13),)
                             ],
                           ),
                         ],
@@ -227,19 +227,19 @@ class _AddTaskState extends State<AddTask> {
 
                           if (_validataTask == false &&
                               _validataSubtitle == false &&
-                              _validataDate == false &&
-                              _importanceInput == false) {
-                            var _user = User();
-                            _user.title = _titleInput.text;
-                            _user.subtitle = _subtitleInput.text;
-                            _user.date = _dateInput.text;
-                            var result = await _UserServices.SaveUser(_user);
-                            print(_importanceInput);
+                              _validataDate == false) {
+                            var _task = Task();
+                            _task.title = _titleInput.text;
+                            _task.subtitle = _subtitleInput.text;
+                            _task.date = _dateInput.text;
+                            _task.importance = _importanceInput;
+                            var result = await _taskServices.SaveTask(_task);
+                            Navigator.pop(context, result);
                           }
                         },
+                          color: Colors.teal[800],
                           child: const Text("add", style: TextStyle(
-                              color: Colors.white, fontSize: 17),),
-                          color: Colors.teal[800],)
+                              color: Colors.white, fontSize: 17),),)
                       ],
                     )
                   ],
@@ -297,3 +297,4 @@ class _BottomNavState extends State<BottomNav> {
     );
   }
 }
+

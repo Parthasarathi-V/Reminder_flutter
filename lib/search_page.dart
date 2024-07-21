@@ -34,7 +34,7 @@ class _SearchPageState extends State<SearchPage> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: (){
               setState(() {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeView()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => HomeView()));
               });
             },),
         ),
@@ -57,7 +57,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: dspSize/50, horizontal: wdh/38),
-                  child: const Tasks(),
+                  child: Tasks(),
                 ),
               ],
             ),

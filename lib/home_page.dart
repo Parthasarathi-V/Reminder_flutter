@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:reminder/search_page.dart';
+import 'package:reminder/serivice/task_service.dart';
 import 'addTask.dart';
+import 'model/task.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -46,7 +48,7 @@ class _HomeViewState extends State<HomeView> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Tasks(),
+                  child: Tasks(),
               ),
             ],
           ),
@@ -57,10 +59,51 @@ class _HomeViewState extends State<HomeView> {
   }
 }
 
-class Tasks extends StatelessWidget {
-  const Tasks({super.key});
+class Tasks extends StatefulWidget {
+
+  var title;
+  var subtitle;
+  var date;
+  var importance;
+  var id;
 
   @override
+  State<Tasks> createState() => _TasksState();
+}
+
+class _TasksState extends State<Tasks> {
+
+  late List<Tasks> _taskList;
+  final _taskSerivice = TaskService();
+
+  getAllTasks() async{
+    var tasks = await _taskSerivice.readAllTasks();
+    tasks.forEach((tasks){
+      setState(() {
+        var taskModule = Tasks();
+        taskModule.id = tasks['id'];
+        taskModule.title = tasks['title'];
+        taskModule.subtitle = tasks['subtitle'];
+        taskModule.date = tasks['date'];
+        taskModule.importance = tasks['importance'];
+        _taskList.add(taskModule);
+      });
+    });
+  }
+
+  @override
+
+  void initState(){
+    getAllTasks();
+    super.initState();
+    _taskList=[];
+  }
+
+  completeBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)));
+  }
+
   Widget build(BuildContext context) {
     final hgt = MediaQuery.of(context).size.height;
     final wdh = MediaQuery.of(context).size.width;
@@ -85,22 +128,30 @@ class Tasks extends StatelessWidget {
             ),
           ),
           SizedBox(height: hgt/70,),
-          TaskCards(titleIn: 'study', subtitleIn: 'Tomorrow is your exam because you must study', importance: "Important",),
-        ]
+          for(int i = 0; i < _taskList.length; i++)
+            TaskCards(titleIn: _taskList[i].title ?? '',
+              subtitleIn: _taskList[i].subtitle ?? '',
+              importance: _taskList[i].importance ?? 'null',
+              date: _taskList[i].date ?? '',
+              ),
+
+    ]
     );
   }
 }
 
 class TaskCards extends StatelessWidget {
 
-  TaskCards({super.key, required this.titleIn, required this.subtitleIn, required this.importance});
+  TaskCards({super.key, required this.titleIn, required this.subtitleIn, required this.importance, required this.date});
   String titleIn = "";
   String subtitleIn = "";
   String importance = "";
+  String date = "";
 
   Future showTask(BuildContext context, String title, String description, String importance, Color clr) async {
     final hgt = MediaQuery.of(context).size.height;
     final wdh = MediaQuery.of(context).size.width;
+    print(importance);
     return showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -109,8 +160,8 @@ class TaskCards extends StatelessWidget {
                 children: [
                   Text(title),
                   const SizedBox(width: 10,),
-                  const Text(" 01:00 AM \n 21/07/2024 ", style: TextStyle(fontSize: 10,color: Colors.black54),),
-                  SizedBox(width: wdh/5,),
+                  Text("01:00 AM \n $date ", style: const TextStyle(fontSize: 10,color: Colors.black54),),
+                  SizedBox(width: wdh/15,),
                   Icon(Icons.tag_outlined,color: clr,size: 10,),
                   Text(importance, style: TextStyle(fontSize: 10,color: clr),),
                 ],
@@ -135,7 +186,7 @@ class TaskCards extends StatelessWidget {
     else if(importance == "Important"){
       clr = Colors.green;
     }
-    else if(importance == "Not Important"){
+    else if(importance == "Work"){
       clr = Colors.grey;
     }
     else{
@@ -324,6 +375,33 @@ class BottomNav extends StatefulWidget {
 }
 
 class _BottomNavState extends State<BottomNav> {
+  late List<Tasks> _taskList;
+  final _taskSerivice = TaskService();
+
+  getAllTasks() async{
+  var tasks = await _taskSerivice.readAllTasks();
+  tasks.forEach((tasks){
+    setState(() {
+      var taskModule = Tasks();
+      taskModule.id = tasks['id'];
+      taskModule.title = tasks['title'];
+      taskModule.subtitle = tasks['subtitle'];
+      taskModule.date = tasks['date'];
+      taskModule.importance = tasks['importance'];
+      _taskList.add(taskModule);
+    });
+  });
+}
+  void initState(){
+    getAllTasks();
+    super.initState();
+    _taskList=[];
+  }
+
+  completeBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)));
+  }
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
@@ -346,7 +424,12 @@ class _BottomNavState extends State<BottomNav> {
         else if(index == 1)
         {
           setState(() {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => AddTask()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => AddTask())).then((data) {
+              if (data != null){
+                getAllTasks();
+                completeBar("The Task is added Successfully");
+              }
+            });
           });
         }
         else

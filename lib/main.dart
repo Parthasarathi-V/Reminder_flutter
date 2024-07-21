@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reminder/home_page.dart';
 import 'package:reminder/search_page.dart';
 
 void main(){
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SearchPage();
+    return HomeView();
 
   }
 }
